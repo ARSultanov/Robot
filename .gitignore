@@ -1,0 +1,4 @@
+.pio/*
+firmware/stm32_mcu/.pio/*
+firmware/stm32_mcu/.vscode/*
+.vscode/*
