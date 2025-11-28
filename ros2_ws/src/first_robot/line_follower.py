@@ -15,9 +15,9 @@ class LineFollower(Node):
         try:
             self.serial = serial.Serial('/dev/ttyACM0', 115200, timeout=1)
             time.sleep(2)
-            self.get_logger().info("✅ Connected to STM32")
+            self.get_logger().info("Connected to STM32")
         except Exception as e:
-            self.get_logger().error(f"❌ STM32 connection failed: {e}")
+            self.get_logger().error(f"STM32 connection failed: {e}")
             return
         
         # Настройка камеры
@@ -37,7 +37,7 @@ class LineFollower(Node):
         # Таймер для обработки кадров
         self.timer = self.create_timer(0.1, self.process_frame)  # 10 FPS
         
-        self.get_logger().info("🚀 Line Follower Started!")
+        self.get_logger().info("Line Follower Started!")
     
     def detect_yellow_line(self, frame):
         """Обнаружение желтой линии"""
@@ -77,13 +77,13 @@ class LineFollower(Node):
             command = f"MOTO:{left_speed},{right_speed}\n"
             self.serial.write(command.encode())
         except Exception as e:
-            self.get_logger().error(f"❌ Motor command failed: {e}")
+            self.get_logger().error(f"Motor command failed: {e}")
     
     def process_frame(self):
         """Обработка одного кадра"""
         ret, frame = self.cap.read()
         if not ret:
-            self.get_logger().error("❌ Cannot read from camera")
+            self.get_logger().error("Cannot read from camera")
             return
         
         # Обнаружение линии
@@ -92,7 +92,7 @@ class LineFollower(Node):
         
         # Если линия не найдена
         if line_center is None:
-            self.get_logger().warn("⚠️ Line lost - searching...")
+            self.get_logger().warn("Line lost - searching...")
             self.send_motor_command(0, 100)  # Поворот на месте
             return
         
@@ -117,7 +117,7 @@ class LineFollower(Node):
         self.send_motor_command(left_speed, right_speed)
         
         # Логирование
-        self.get_logger().info(f"🎯 Line at: {line_center[0]}, Motors: L={left_speed}, R={right_speed}")
+        self.get_logger().info(f"Line at: {line_center[0]}, Motors: L={left_speed}, R={right_speed}")
         
         # Отладочная визуализация (опционально)
         self.debug_display(frame, mask, line_center, left_speed, right_speed)
@@ -140,7 +140,7 @@ class LineFollower(Node):
         """Остановка моторов при завершении"""
         try:
             self.serial.write(b"STOP\n")
-            self.get_logger().info("🛑 Motors stopped")
+            self.get_logger().info("Motors stopped")
         except:
             pass
 
@@ -151,7 +151,7 @@ def main():
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:
-        node.get_logger().info("🛑 Line follower stopped by user")
+        node.get_logger().info("Line follower stopped by user")
     finally:
         node.stop_motors()
         if hasattr(node, 'cap'):
